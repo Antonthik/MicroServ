@@ -60,7 +60,15 @@ namespace MicroServ
         {
             if (Values != null) 
             {
-               Values.Remove(dateToDelete);
+                try
+                {
+                    Values.Remove(dateToDelete);
+                }
+                catch (Exception)
+                {
+
+                    Console.WriteLine($"Ошибка при удалении: {dateToDelete}");
+                }               
             }            
         }
         /// <summary>
@@ -71,7 +79,16 @@ namespace MicroServ
         public void Update(string stringsToUpdate, string newValue)
         {
             var parsedint = int.Parse(newValue);
-            Values[stringsToUpdate].TemperatureC = parsedint;
+            try
+            {
+                Values[stringsToUpdate].TemperatureC = parsedint;
+            }
+            catch (Exception)
+            {
+
+                Console.WriteLine($"Ошибка при редактировании: {stringsToUpdate}");
+            }
+            
         }
 
     }
