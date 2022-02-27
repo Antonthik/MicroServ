@@ -22,6 +22,7 @@ namespace MicroServ.Controllers
         [HttpPost("register")]
         public IActionResult RegisterAgent([FromBody] AgentInfo agentInfo)
         {
+            var gg = 1;
             return Ok();
         }
 
