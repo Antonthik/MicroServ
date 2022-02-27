@@ -25,7 +25,9 @@ namespace MicroServ
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton<WeatherHolder>();//добавляем новый контролер
+            //services.AddSingleton<WeatherHolder>();//добавляем 
+            services.AddSingleton<AgentInfo>();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
