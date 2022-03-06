@@ -19,13 +19,15 @@ namespace MicroServ.Controllers
     public class CpuMetricsController : ControllerBase
     {
         private readonly ILogger<CpuMetricsController> _logger;
-        private CpuMetricsRepository repository;
-        public CpuMetricsController(ILogger<CpuMetricsController> logger, CpuMetricsRepository repository)//элемент логирования
+        private CpuMetricsRepository _repository;
+        public CpuMetricsController(ILogger<CpuMetricsController> logger,CpuMetricsRepository repository)//элемент логирования
         {
             _logger = logger;//элемент логирования
             _logger.LogDebug(1, "NLog встроен в CpuMetricsController");//элемент логирования
 
-           this.repository = repository;
+            _repository = repository;
+
+ 
 
         }
 
@@ -52,7 +54,7 @@ namespace MicroServ.Controllers
         /// <summary>
         /// Метод для подключения к sql-базе
         /// </summary>
-        /// <returns>http://localhost:5000/api/metrics/cpu/sql-test - пример запроса</returns>
+        /// <returns>http  ://localhost:5000/api/metrics/cpu/sql-test - пример запроса</returns>
         [HttpGet("sql-test")]
         public IActionResult TryToSqlLite()
         {
@@ -113,7 +115,7 @@ namespace MicroServ.Controllers
 
                     // Создаём строку для выборки данных из базы
                     // LIMIT 3 обозначает, что мы достанем только 3 записи
-                    string readQuery = "SELECT * FROM cpumetrics LIMIT 3";
+                    string readQuery = "SELECT * FROM cpumetrics LIMIT 2 ";
 
                     // Создаём массив, в который запишем объекты с данными из базы данных
                     var returnArray = new CpuMetric[3];
@@ -133,7 +135,7 @@ namespace MicroServ.Controllers
                             {
                                 Id = reader.GetInt32(0), // Читаем данные, полученные из базы данных
                                 Value = reader.GetInt32(1), // преобразуя к целочисленному типу
-                                Time = reader.GetInt64(2)
+                                //Time = reader.GetDateTime;//reader.GetInt64(2)
                             };
                             // Увеличиваем значение счётчика
                             counter++;
@@ -148,19 +150,22 @@ namespace MicroServ.Controllers
         [HttpPost("create")]
         public IActionResult Create([FromBody] CpuMetricCreateRequest request)
         {
-            repository.Create(new CpuMetric
-            {
-                Time = request.Time,
-                Value = request.Value
-            });
+           _repository.Create(new CpuMetric
+           {
+             Time = request.Time,
+             Value = request.Value
+           });
 
+            _logger.LogInformation($"Добавлены данные для Cpu метод Create: Value {request.Value} Time {request.Time}");//элемент логирования
             return Ok();
         }
+
+
 
         [HttpGet("all")]
         public IActionResult GetAll()
         {
-            var metrics = repository.GetAll();
+            var metrics = _repository.GetAll();
 
             var response = new AllCpuMetricsResponse()
             {
@@ -175,4 +180,7 @@ namespace MicroServ.Controllers
             return Ok(response);
         }
     }
+
+
 }
+

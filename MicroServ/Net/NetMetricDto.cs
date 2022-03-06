@@ -2,7 +2,7 @@
 
 namespace MicroServ.Controllers
 {
-    public class CpuMetricDto
+    public class NetMetricDto
     {
         //public TimeSpan Time { get; set; }
         public long Time { get; set; }

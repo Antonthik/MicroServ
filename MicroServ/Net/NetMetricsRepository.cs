@@ -5,12 +5,12 @@ using System.Data.SQLite;
 namespace MicroServ
 {
     
-     public class CpuMetricsRepository : IRepository<CpuMetric>
+     public class NetMetricsRepository : INetMetricsRepository
     {
-        private const string ConnectionString = "Data Source=metrics.db;Version=3;Pooling=true;Max Pool Size=100;"
+        private const string ConnectionString = "Data Source=metrics.db;Version=3;Pooling=true;Max Pool Size=100;";
         // Инжектируем соединение с базой данных в наш репозиторий через конструктор
 
-        public void Create(CpuMetric item)
+        public void Create(NetMetric item)
         {
             using var connection = new SQLiteConnection(ConnectionString);
             connection.Open();
@@ -24,7 +24,8 @@ namespace MicroServ
 
             // В таблице будем хранить время в секундах, поэтому преобразуем перед записью в секунды
             // через свойство
-           // cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
+             //cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
+               cmd.Parameters.AddWithValue("@time", item.Time);
             // подготовка команды к выполнению
             cmd.Prepare();
 
@@ -45,7 +46,7 @@ namespace MicroServ
             cmd.ExecuteNonQuery();
         }
 
-        public void Update(CpuMetric item)
+        public void Update(NetMetric item)
         {
             using var connection = new SQLiteConnection(ConnectionString);
             using var cmd = new SQLiteCommand(connection);
@@ -53,13 +54,14 @@ namespace MicroServ
             cmd.CommandText = "UPDATE cpumetrics SET value = @value, time = @time WHERE id=@id;";
             cmd.Parameters.AddWithValue("@id", item.Id);
             cmd.Parameters.AddWithValue("@value", item.Value);
-            cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
+            //cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
+            cmd.Parameters.AddWithValue("@time", item.Time);
             cmd.Prepare();
 
             cmd.ExecuteNonQuery();
         }
 
-        public IList<CpuMetric> GetAll()
+        public IList<NetMetric> GetAll()
         {
             using var connection = new SQLiteConnection(ConnectionString);
             connection.Open();
@@ -68,7 +70,7 @@ namespace MicroServ
             // Прописываем в команду SQL-запрос на получение всех данных из таблицы
             cmd.CommandText = "SELECT * FROM cpumetrics";
 
-            var returnList = new List<CpuMetric>();
+            var returnList = new List<NetMetric>();
 
             using (SQLiteDataReader reader = cmd.ExecuteReader())
             {
@@ -76,12 +78,13 @@ namespace MicroServ
                 while (reader.Read())
                 {
                     // Добавляем объект в список возврата
-                    returnList.Add(new CpuMetric
+                    returnList.Add(new NetMetric
                     {
                         Id = reader.GetInt32(0),
                         Value = reader.GetInt32(1),
                         // Налету преобразуем прочитанные секунды в метку времени
                         //Time = TimeSpan.FromSeconds(reader.GetInt32(2))
+                        Time = reader.GetInt32(2)
                     });
                 }
             }
@@ -89,7 +92,7 @@ namespace MicroServ
             return returnList;
         }
 
-        public CpuMetric GetById(int id)
+        public NetMetric GetById(int id)
         {
             using var connection = new SQLiteConnection(ConnectionString);
             connection.Open();
@@ -101,7 +104,7 @@ namespace MicroServ
                 if (reader.Read())
                 {
                     // возвращаем прочитанное
-                    return new CpuMetric
+                    return new NetMetric
                     {
                         Id = reader.GetInt32(0),
                         Value = reader.GetInt32(1),
