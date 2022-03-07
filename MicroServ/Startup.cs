@@ -57,11 +57,31 @@ namespace MicroServ
                 // Удаляем таблицу с метриками, если она есть в базе данных
                 command.CommandText = "DROP TABLE IF EXISTS cpumetrics";
                 // Отправляем запрос в базу данных
+                command.ExecuteNonQuery();        
+                command.CommandText = @"CREATE TABLE cpumetrics(id INTEGER PRIMARY KEY,value INT, time INT)";
                 command.ExecuteNonQuery();
-        
-        
-                command.CommandText = @"CREATE TABLE cpumetrics(id INTEGER PRIMARY KEY,
-                    value INT, time INT)";
+            }
+            using (var command = new SQLiteCommand(connection))
+            {
+                command.CommandText = "DROP TABLE IF EXISTS hddmetrics";
+                command.ExecuteNonQuery();
+                command.CommandText = @"CREATE TABLE hddmetrics(id INTEGER PRIMARY KEY,value INT, time INT)";
+                command.ExecuteNonQuery();
+            }
+
+            using (var command = new SQLiteCommand(connection))
+            {
+                command.CommandText = "DROP TABLE IF EXISTS rammetrics";
+                command.ExecuteNonQuery();
+                command.CommandText = @"CREATE TABLE rammetrics(id INTEGER PRIMARY KEY,value INT, time INT)";
+                command.ExecuteNonQuery();
+            }
+
+            using (var command = new SQLiteCommand(connection))
+            {
+                command.CommandText = "DROP TABLE IF EXISTS netmetrics";
+                command.ExecuteNonQuery();
+                command.CommandText = @"CREATE TABLE netmetrics(id INTEGER PRIMARY KEY,value INT, time INT)";
                 command.ExecuteNonQuery();
             }
         }

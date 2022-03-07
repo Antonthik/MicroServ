@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MicroServ", "MicroServ\MicroServ.csproj", "{70E15737-268F-418A-91D6-1C92E9571210}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetricManadgerTest", "MetricManadgerTest\MetricManadgerTest.csproj", "{5149D16B-9A3F-46AA-8565-9AB64C335656}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetricManadgerTest", "MetricManadgerTest\MetricManadgerTest.csproj", "{5149D16B-9A3F-46AA-8565-9AB64C335656}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
