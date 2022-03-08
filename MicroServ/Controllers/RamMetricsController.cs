@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -54,24 +55,47 @@ namespace MicroServ.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Используем Mapper
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("all")]
         public IActionResult GetAll()
         {
-            var metrics = _repository.GetAll();
-
+            // Задаём конфигурацию для маппера. Первый обобщённый параметр — тип объекта источника, второй — тип объекта, в который перетекут данные из источника
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<RamMetric, RamMetricDto>());
+            var mapper = config.CreateMapper();
+            IList<RamMetric> metrics = _repository.GetAll();
             var response = new AllRamMetricsResponse()
             {
                 Metrics = new List<RamMetricDto>()
             };
-
             foreach (var metric in metrics)
             {
-                response.Metrics.Add(new RamMetricDto { Time = metric.Time, Value = metric.Value, Id = metric.Id });
+                // Добавляем объекты в ответ, используя маппер
+                response.Metrics.Add(mapper.Map<RamMetricDto>(metric));
             }
-
             return Ok(response);
         }
 
+        //[HttpGet("all")]
+        //public IActionResult GetAll()
+        //{
+        //    var metrics = _repository.GetAll();
+        //
+        //    var response = new AllRamMetricsResponse()
+        //    {
+        //        Metrics = new List<RamMetricDto>()
+        //    };
+        //
+        //    foreach (var metric in metrics)
+        //    {
+        //        response.Metrics.Add(new RamMetricDto { Time = metric.Time, Value = metric.Value, Id = metric.Id });
+        //    }
+        //
+        //    return Ok(response);
+        //}
+        //
 
 
     }
