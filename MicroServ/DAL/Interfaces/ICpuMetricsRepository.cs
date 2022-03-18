@@ -1,6 +1,6 @@
 ﻿namespace MicroServ
 {
-    internal interface ICpuMetricsRepository: IRepository<CpuMetric>
+    public interface ICpuMetricsRepository: IRepository<CpuMetric>
 
     {
     }

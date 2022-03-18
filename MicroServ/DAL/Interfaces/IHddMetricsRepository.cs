@@ -1,6 +1,6 @@
 ﻿namespace MicroServ
 {
-    internal interface IHddMetricsRepository: IRepository<HddMetric>
+    public interface IHddMetricsRepository: IRepository<HddMetric>
 
     {
     }

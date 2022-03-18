@@ -1,6 +1,6 @@
 ﻿namespace MicroServ
 {
-    internal interface INetMetricsRepository: IRepository<NetMetric>
+    public interface INetMetricsRepository: IRepository<NetMetric>
 
     {
     }

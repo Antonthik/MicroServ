@@ -1,6 +1,6 @@
 ﻿namespace MicroServ
 {
-    internal interface IRamMetricsRepository : IRepository<RamMetric>
+    public interface IRamMetricsRepository : IRepository<RamMetric>
 
     {
     }
