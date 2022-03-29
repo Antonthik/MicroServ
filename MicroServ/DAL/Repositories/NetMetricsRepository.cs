@@ -35,6 +35,13 @@ namespace MicroServ
                         // time = item.Time.TotalSeconds
                         time = item.Time
                     });
+                connection.Execute("INSERT INTO netmetricsagent(value, time, agentId) VALUES(@value, @time, @agentId)",//добавляем в таблицу metricsagent
+                    new
+                    {
+                        value = item.Value,
+                        time = item.Time,
+                        agentId = 3
+                    });
             }
         }
 
@@ -62,6 +69,32 @@ namespace MicroServ
                         time = item.Time,
                         id = item.Id
                     });
+            }
+        }
+        public IList<NetMetric> GetFromTo(long FromTime, long ToTime)
+        {
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                return connection.Query<NetMetric>("SELECT Id, Time, Value FROM netmetrics WHERE Time>=@FromTime and Time<=@ToTime",
+
+                    new
+                    {
+                        FromTime = FromTime,
+                        ToTime = ToTime
+                    }).ToList();
+            }
+        }
+        public IList<NetMetric> GetFromToAgent(long FromTime, long ToTime)
+        {
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                return connection.Query<NetMetric>("SELECT Id, Time, Value FROM netmetricsagent WHERE Time>=@FromTime and Time<=@ToTime",
+
+                    new
+                    {
+                        FromTime = FromTime,
+                        ToTime = ToTime
+                    }).ToList();
             }
         }
 

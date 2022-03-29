@@ -35,7 +35,15 @@ namespace MicroServ
                         // Записываем в поле time количество секунд
                         // time = item.Time.TotalSeconds
                         time = item.Time
+                    });                        
+                connection.Execute("INSERT INTO cpumetricsagent(value, time, agentId) VALUES(@value, @time, @agentId)",//добавляем в таблицу metricsagent
+                    new
+                    {
+                        value = item.Value,
+                        time = item.Time,
+                        agentId = 1
                     });
+
             }
         }
 
@@ -63,6 +71,32 @@ namespace MicroServ
                         time = item.Time,
                         id = item.Id
                     });
+            }
+        }
+        public IList<CpuMetric> GetFromTo(long FromTime, long ToTime)
+        {
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                return connection.Query<CpuMetric>("SELECT Id, Time, Value FROM cpumetrics WHERE Time>=@FromTime and Time<=@ToTime",
+
+                    new
+                    {
+                        FromTime = FromTime,
+                        ToTime = ToTime
+                    }).ToList();
+            }
+        }
+        public IList<CpuMetric> GetFromToAgent(long FromTime, long ToTime)
+        {
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                return connection.Query<CpuMetric>("SELECT Id, Time, Value FROM cpumetricsagent WHERE Time>=@FromTime and Time<=@ToTime",
+
+                    new
+                    {
+                        FromTime = FromTime,
+                        ToTime = ToTime
+                    }).ToList();
             }
         }
 

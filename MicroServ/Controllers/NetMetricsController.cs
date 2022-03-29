@@ -27,13 +27,26 @@ namespace MicroServ.Controllers
 
             _repository = repository;
         }
-        /// <summary>
-        /// Агент сбора метрики dotnet
-        /// </summary>
-        /// <param name="agentId"></param>
-        /// <param name="fromTime"></param>
-        /// <param name="toTime"></param>
-        /// <returns></returns>
+
+        [HttpGet("allfromto/from/{fromTime}/to/{toTime}")]
+        public IActionResult GetMetricsFromAgent([FromRoute] int fromTime, [FromRoute] int toTime)
+        {
+            // Задаём конфигурацию для маппера. Первый обобщённый параметр — тип объекта источника, второй — тип объекта, в который перетекут данные из источника
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<NetMetric, NetMetricDto>());
+            var mapper = config.CreateMapper();
+            //IList<NetMetric> metrics = _repository.GetFromTo(fromTime, toTime);
+            IList<NetMetric> metrics = _repository.GetFromToAgent(fromTime, toTime);
+            var response = new AllNetMetricsResponse()
+            {
+                Metrics = new List<NetMetricDto>()
+            };
+            foreach (var metric in metrics)
+            {
+                // Добавляем объекты в ответ, используя маппер
+                response.Metrics.Add(mapper.Map<NetMetricDto>(metric));
+            }
+            return Ok(response);
+        }
         [HttpGet("/from/{fromTime}/to/{toTime}")]
         public IActionResult GetMetricsFromAgent([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
         {

@@ -27,18 +27,25 @@ namespace MicroServ.Controllers
 
             _repository = repository;
         }
-
-        /// <summary>
-        /// Агент сбора метрики hdd
-        /// </summary>
-        /// <param name="agentId"></param>
-        /// <param name="fromTime"></param>
-        /// <param name="toTime"></param>
-        /// <returns></returns>
-        [HttpGet("/left/from/{fromTime}/to/{toTime}")]
-        public IActionResult GetMetricsFromAgent([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+        
+        [HttpGet("allfromto/from/{fromTime}/to/{toTime}")]
+        public IActionResult GetMetricsFromAgent([FromRoute] int fromTime, [FromRoute] int toTime)
         {
-            return Ok();
+            // Задаём конфигурацию для маппера. Первый обобщённый параметр — тип объекта источника, второй — тип объекта, в который перетекут данные из источника
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<HddMetric, HddMetricDto>());
+            var mapper = config.CreateMapper();
+            //IList<HddMetric> metrics = _repository.GetFromTo(fromTime, toTime);
+            IList<HddMetric> metrics = _repository.GetFromToAgent(fromTime, toTime);
+            var response = new AllHddMetricsResponse()
+            {
+                Metrics = new List<HddMetricDto>()
+            };
+            foreach (var metric in metrics)
+            {
+                // Добавляем объекты в ответ, используя маппер
+                response.Metrics.Add(mapper.Map<HddMetricDto>(metric));
+            }
+            return Ok(response);
         }
 
         [HttpPost("create")]

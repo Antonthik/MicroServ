@@ -34,6 +34,13 @@ namespace MicroServ
                         // time = item.Time.TotalSeconds
                         time = item.Time
                     });
+                connection.Execute("INSERT INTO rammetricsagent(value, time, agentId) VALUES(@value, @time, @agentId)",//добавляем в таблицу metricsagent
+                    new
+                    {
+                        value = item.Value,
+                        time = item.Time,
+                        agentId = 4
+                    });
             }
         }
 
@@ -61,6 +68,32 @@ namespace MicroServ
                         time = item.Time,
                         id = item.Id
                     });
+            }
+        }
+        public IList<RamMetric> GetFromTo(long FromTime, long ToTime)
+        {
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                return connection.Query<RamMetric>("SELECT Id, Time, Value FROM rammetrics WHERE Time>=@FromTime and Time<=@ToTime",
+
+                    new
+                    {
+                        FromTime = FromTime,
+                        ToTime = ToTime
+                    }).ToList();
+            }
+        }
+        public IList<RamMetric> GetFromToAgent(long FromTime, long ToTime)
+        {
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                return connection.Query<RamMetric>("SELECT Id, Time, Value FROM rammetricsagent WHERE Time>=@FromTime and Time<=@ToTime",
+
+                    new
+                    {
+                        FromTime = FromTime,
+                        ToTime = ToTime
+                    }).ToList();
             }
         }
 

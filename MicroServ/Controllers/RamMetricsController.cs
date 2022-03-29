@@ -28,13 +28,25 @@ namespace MicroServ.Controllers
             _repository = repository;
         }
 
-        /// <summary>
-        /// Агент сбора метрики ram
-        /// </summary>
-        /// <param name="agentId"></param>
-        /// <param name="fromTime"></param>
-        /// <param name="toTime"></param>
-        /// <returns></returns>
+        [HttpGet("allfromto/from/{fromTime}/to/{toTime}")]
+        public IActionResult GetMetricsFromAgent([FromRoute] int fromTime, [FromRoute] int toTime)
+        {
+            // Задаём конфигурацию для маппера. Первый обобщённый параметр — тип объекта источника, второй — тип объекта, в который перетекут данные из источника
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<RamMetric, RamMetricDto>());
+            var mapper = config.CreateMapper();
+            //IList<RamMetric> metrics = _repository.GetFromTo(fromTime, toTime);
+            IList<RamMetric> metrics = _repository.GetFromToAgent(fromTime, toTime);
+            var response = new AllRamMetricsResponse()
+            {
+                Metrics = new List<RamMetricDto>()
+            };
+            foreach (var metric in metrics)
+            {
+                // Добавляем объекты в ответ, используя маппер
+                response.Metrics.Add(mapper.Map<RamMetricDto>(metric));
+            }
+            return Ok(response);
+        }
         [HttpGet("/available/from/{fromTime}/to/{toTime}")]
         public IActionResult GetMetricsFromAgent([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
         {

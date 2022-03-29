@@ -35,6 +35,13 @@ namespace MicroServ
                         // time = item.Time.TotalSeconds
                         time = item.Time
                     });
+                connection.Execute("INSERT INTO hddmetricsagent(value, time, agentId) VALUES(@value, @time, @agentId)",//добавляем в таблицу metricsagent
+                    new
+                    {
+                        value = item.Value,
+                        time = item.Time,
+                        agentId = 2
+                    });
             }
         }
 
@@ -73,6 +80,30 @@ namespace MicroServ
                 // объект которого Dapper, он сам заполнит его поля
                 // в соответствии с названиями колонок
                 return connection.Query<HddMetric>("SELECT Id, Time, Value FROM hddmetrics").ToList();
+            }
+        }
+        public IList<HddMetric> GetFromTo(long FromTime, long ToTime)
+        {
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                return connection.Query<HddMetric>("SELECT Id, Time, Value FROM hddmetrics WHERE Time>=@FromTime and Time<=@ToTime",
+                    
+                    new { FromTime = FromTime,
+                          ToTime = ToTime
+                    }).ToList();
+            }
+        }
+        public IList<HddMetric> GetFromToAgent(long FromTime, long ToTime)
+        {
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                return connection.Query<HddMetric>("SELECT Id, Time, Value FROM hddmetricsagent WHERE Time>=@FromTime and Time<=@ToTime",
+
+                    new
+                    {
+                        FromTime = FromTime,
+                        ToTime = ToTime
+                    }).ToList();
             }
         }
 

@@ -27,18 +27,27 @@ namespace MicroServ.Controllers
             _logger.LogDebug(1, "NLog встроен в CpuMetricsController");//элемент логирования
 
             _repository = repository;
-
- 
-
         }
 
-        /// <summary>
-        /// Агент сбора метрики процессора
-        /// </summary>
-        /// <param name="agentId"></param>
-        /// <param name="fromTime"></param>
-        /// <param name="toTime"></param>
-        /// <returns></returns>
+        [HttpGet("allfromto/from/{fromTime}/to/{toTime}")]
+        public IActionResult GetMetricsFromAgent([FromRoute] int fromTime, [FromRoute] int toTime)
+        {
+            // Задаём конфигурацию для маппера. Первый обобщённый параметр — тип объекта источника, второй — тип объекта, в который перетекут данные из источника
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<CpuMetric, CpuMetricDto>());
+            var mapper = config.CreateMapper();
+            //IList<CpuMetric> metrics = _repository.GetFromTo(fromTime, toTime);
+            IList<CpuMetric> metrics = _repository.GetFromToAgent(fromTime, toTime);
+            var response = new AllCpuMetricsResponse()
+            {
+                Metrics = new List<CpuMetricDto>()
+            };
+            foreach (var metric in metrics)
+            {
+                // Добавляем объекты в ответ, используя маппер
+                response.Metrics.Add(mapper.Map<CpuMetricDto>(metric));
+            }
+            return Ok(response);
+        }
         [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
         public IActionResult GetMetricsFromAgent([FromRoute] int agentId, [FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
         {

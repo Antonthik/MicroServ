@@ -38,7 +38,8 @@ namespace MicroServ
             services.AddControllers();
             //services.AddSingleton<WeatherHolder>();//добавляем 
             services.AddSingleton<AgentInfo>();
-        
+            services.AddHttpClient();//урок6 Добавляем http клиент
+
             //Паттерн Repository
             ConfigureSqlLiteConnection(services); //Паттерн Repository
             //services.AddScoped<ICpuMetricsRepository, CpuMetricsRepository>(); //Паттерн Repository
@@ -46,6 +47,7 @@ namespace MicroServ
             services.AddScoped<HddMetricsRepository>(); //Паттерн Repository
             services.AddScoped<RamMetricsRepository>(); //Паттерн Repository
             services.AddScoped<NetMetricsRepository>(); //Паттерн Repository
+
 
 
 
@@ -57,16 +59,23 @@ namespace MicroServ
             services.AddSingleton<INetMetricsRepository, NetMetricsRepository>();
             services.AddSingleton<IHddMetricsRepository, HddMetricsRepository>();
 
+            //services.AddSingleton<MetricsAgentClient>();
+
             // Добавляем нашу задачу
             services.AddSingleton<CpuMetricJob>();
             services.AddSingleton<RamMetricJob>();
             services.AddSingleton<NetMetricJob>();
             services.AddSingleton<HddMetricJob>();
 
+            //services.AddSingleton<MetricsAgentClientsJob>();
+
             services.AddSingleton(new JobSchedule(jobType: typeof(CpuMetricJob),cronExpression: "0/5 * * * * ?")); // Запускать каждые 5 секунд
             services.AddSingleton(new JobSchedule(jobType: typeof(RamMetricJob),cronExpression: "0/5 * * * * ?"));
             services.AddSingleton(new JobSchedule(jobType: typeof(NetMetricJob), cronExpression: "0/5 * * * * ?"));
             services.AddSingleton(new JobSchedule(jobType: typeof(HddMetricJob), cronExpression: "0/5 * * * * ?"));
+
+            //services.AddSingleton(new JobSchedule(jobType: typeof(MetricsAgentClientsJob), cronExpression: "0/5 * * * * ?"));
+            
 
             services.AddHostedService<QuartzHostedService>();
 
@@ -144,6 +153,29 @@ namespace MicroServ
                 command.CommandText = "DROP TABLE IF EXISTS netmetrics";
                 command.ExecuteNonQuery();
                 command.CommandText = @"CREATE TABLE netmetrics(id INTEGER PRIMARY KEY,value INT, time LONG)";
+                command.ExecuteNonQuery();
+            }
+            //создаем таблицы агента
+            using (var command = new SQLiteCommand(connection))
+            {
+                command.CommandText = "DROP TABLE IF EXISTS cpumetricsagent";
+                command.ExecuteNonQuery();
+                command.CommandText = @"CREATE TABLE cpumetricsagent(id INTEGER PRIMARY KEY,value INT, time LONG,agentId INTEGER )";
+                command.ExecuteNonQuery();
+
+                command.CommandText = "DROP TABLE IF EXISTS hddmetricsagent";
+                command.ExecuteNonQuery();
+                command.CommandText = @"CREATE TABLE hddmetricsagent(id INTEGER PRIMARY KEY,value INT, time LONG,agentId INTEGER )";
+                command.ExecuteNonQuery();
+
+                command.CommandText = "DROP TABLE IF EXISTS rammetricsagent";
+                command.ExecuteNonQuery();
+                command.CommandText = @"CREATE TABLE rammetricsagent(id INTEGER PRIMARY KEY,value INT, time LONG,agentId INTEGER )";
+                command.ExecuteNonQuery();
+
+                command.CommandText = "DROP TABLE IF EXISTS netmetricsagent";
+                command.ExecuteNonQuery();
+                command.CommandText = @"CREATE TABLE netmetricsagent(id INTEGER PRIMARY KEY,value INT, time LONG,agentId INTEGER )";
                 command.ExecuteNonQuery();
             }
         }
