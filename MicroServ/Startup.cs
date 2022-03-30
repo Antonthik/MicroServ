@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
@@ -47,6 +48,30 @@ namespace MicroServ
             services.AddScoped<HddMetricsRepository>(); //Паттерн Repository
             services.AddScoped<RamMetricsRepository>(); //Паттерн Repository
             services.AddScoped<NetMetricsRepository>(); //Паттерн Repository
+
+            //Урок 7 Swagger
+            services.AddSwaggerGen();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "API сервиса агента сбора метрик",
+                    Description = "Здесь можно поиграть с api нашего сервиса",
+                    TermsOfService = new Uri("https://example.com/terms"),
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Semenov",
+                        //Email = sa@mail.ru,
+                        //Url = new Uri("https://kremlin.ru"),
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "Можно указать, под какой лицензией всё опубликовано",
+                        Url = new Uri("https://example.com/license"),
+                    }
+                });
+            });
 
 
 
@@ -199,6 +224,13 @@ namespace MicroServ
             });
             // Запускаем миграции
             //migrationRunner.MigrateUp();
+
+            // Включение middleware в пайплайн для обработки Swagger-запросов.
+            app.UseSwagger();
+            // включение middleware для генерации swagger-ui
+            // указываем эндпоинт Swagger JSON (куда обращаться за сгенерированной спецификацией,
+            // по которой будет построен UI).
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "API сервиса агента сбора метрик"); });
         }
 
 
